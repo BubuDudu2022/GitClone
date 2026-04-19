@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  font-family: system-ui;
+  background: #0d1117;
+  color: #c9d1d9;
+}
+
+input {
+  padding: 8px;
+  margin: 5px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  color: white;
+}
+
+button {
+  padding: 8px 12px;
+  background: #238636;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
