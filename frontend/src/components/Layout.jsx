@@ -40,85 +40,173 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div style={{ background: "#0d1117", minHeight: "100vh", color: "white" }}>
+    <div style={container}>
       
-      {/* Navbar */}
-      <div style={{ background: "#161b22", padding: "15px 40px", display: "flex", justifyContent: "space-between" }}>
-        
-        <div>
-          <Link to="/" style={link}>Home</Link>
+      {/* NAVBAR */}
+      <div style={navbar}>
+        <div style={navLeft}>
+          <Link to="/" style={logo}>MiniGit</Link>
+
           <Link to="/repos" style={link}>Repositories</Link>
-          <Link to="/prs" style={link}>Pull Requests</Link>
           <Link to="/create-repo" style={link}>Create Repo</Link>
         </div>
 
-        <div>
+        <div style={navRight}>
           {!user ? (
             <>
-              <button onClick={() => { setShowModal(true); setIsLogin(true); }}>Login</button>
-              <button onClick={() => { setShowModal(true); setIsLogin(false); }} style={{ marginLeft: "10px" }}>
+              <button style={secondaryBtn} onClick={() => { setShowModal(true); setIsLogin(true); }}>
+                Login
+              </button>
+              <button style={primaryBtn} onClick={() => { setShowModal(true); setIsLogin(false); }}>
                 Register
               </button>
             </>
           ) : (
             <>
-              <span style={{ marginRight: "10px" }}>
+              <span style={userBadge}>
                 👤 {JSON.parse(user).username}
               </span>
-              <button onClick={logout}>Logout</button>
+              <button style={dangerBtn} onClick={logout}>Logout</button>
             </>
           )}
         </div>
-
       </div>
 
-      {/* Modal */}
+      {/* MODAL */}
       {showModal && (
         <div style={modalOverlay}>
           <div style={modalBox}>
-            <h3>{isLogin ? "Login" : "Register"}</h3>
+            <h2 style={{ marginBottom: "20px" }}>
+              {isLogin ? "Welcome Back" : "Create Account"}
+            </h2>
 
             <input
+              style={input}
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
-            <br /><br />
 
             <input
+              style={input}
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <br /><br />
 
-            <button onClick={handleAuth}>
+            <button style={primaryBtnFull} onClick={handleAuth}>
               {isLogin ? "Login" : "Register"}
             </button>
 
-            <p
-              style={{ cursor: "pointer", marginTop: "10px" }}
-              onClick={() => setIsLogin(!isLogin)}
-            >
+            <p style={switchText} onClick={() => setIsLogin(!isLogin)}>
               {isLogin ? "Create account" : "Already have an account?"}
             </p>
 
-            <button onClick={() => setShowModal(false)}>Close</button>
+            <button style={closeBtn} onClick={() => setShowModal(false)}>
+              Close
+            </button>
           </div>
         </div>
       )}
 
-      {/* Page Content */}
-      <div style={{ maxWidth: "1000px", margin: "auto", padding: "20px" }}>
+      {/* CONTENT */}
+      <div style={content}>
         {children}
       </div>
     </div>
   );
 }
 
-const link = { marginRight: "20px", color: "#58a6ff" };
+/* ================= STYLES ================= */
 
+const container = {
+  background: "#0d1117",
+  minHeight: "100vh",
+  color: "white"
+};
+
+const navbar = {
+  background: "#161b22",
+  padding: "12px 40px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  borderBottom: "1px solid #30363d"
+};
+
+const navLeft = {
+  display: "flex",
+  alignItems: "center",
+  gap: "20px"
+};
+
+const navRight = {
+  display: "flex",
+  alignItems: "center",
+  gap: "10px"
+};
+
+const logo = {
+  fontWeight: "bold",
+  fontSize: "18px",
+  color: "#58a6ff",
+  textDecoration: "none"
+};
+
+const link = {
+  color: "#c9d1d9",
+  textDecoration: "none",
+  fontSize: "14px"
+};
+
+const userBadge = {
+  marginRight: "10px",
+  fontSize: "14px",
+  color: "#8b949e"
+};
+
+/* BUTTONS */
+const primaryBtn = {
+  padding: "6px 12px",
+  background: "#238636",
+  border: "none",
+  borderRadius: "6px",
+  color: "white",
+  cursor: "pointer"
+};
+
+const primaryBtnFull = {
+  width: "100%",
+  padding: "10px",
+  marginTop: "10px",
+  background: "#238636",
+  border: "none",
+  borderRadius: "6px",
+  color: "white",
+  cursor: "pointer",
+  fontWeight: "bold"
+};
+
+const secondaryBtn = {
+  padding: "6px 12px",
+  background: "transparent",
+  border: "1px solid #30363d",
+  borderRadius: "6px",
+  color: "white",
+  cursor: "pointer"
+};
+
+const dangerBtn = {
+  padding: "6px 12px",
+  background: "#da3633",
+  border: "none",
+  borderRadius: "6px",
+  color: "white",
+  cursor: "pointer"
+};
+
+/* MODAL */
 const modalOverlay = {
   position: "fixed",
   top: 0,
@@ -134,6 +222,41 @@ const modalOverlay = {
 const modalBox = {
   background: "#161b22",
   padding: "30px",
-  borderRadius: "10px",
-  width: "300px"
+  borderRadius: "12px",
+  width: "320px",
+  border: "1px solid #30363d",
+  display: "flex",
+  flexDirection: "column",
+  gap: "10px"
+};
+
+const input = {
+  padding: "10px",
+  borderRadius: "6px",
+  border: "1px solid #30363d",
+  background: "#0d1117",
+  color: "#c9d1d9"
+};
+
+const switchText = {
+  textAlign: "center",
+  cursor: "pointer",
+  color: "#58a6ff",
+  fontSize: "14px"
+};
+
+const closeBtn = {
+  marginTop: "10px",
+  background: "transparent",
+  border: "1px solid #30363d",
+  color: "white",
+  padding: "6px",
+  borderRadius: "6px",
+  cursor: "pointer"
+};
+
+const content = {
+  maxWidth: "1000px",
+  margin: "auto",
+  padding: "20px"
 };

@@ -15,6 +15,8 @@ export default function RepoDetail() {
   const [newUserId, setNewUserId] = useState("");
   const [newRole, setNewRole] = useState("contributor");
 
+  
+
   const [selectedPR, setSelectedPR] = useState(null);
   const [prDetails, setPrDetails] = useState(null);
   const [comment, setComment] = useState("");
@@ -26,6 +28,8 @@ export default function RepoDetail() {
   });
 
   const user = JSON.parse(localStorage.getItem("user"));
+
+  const currentUserRole = collabs.find(c => c.user_id === user?.id)?.role;
 
   // ✅ POST HELPER
   const post = (url, body, callback) => {
@@ -133,7 +137,17 @@ export default function RepoDetail() {
 
             <button
               style={button}
-              onClick={() => post("pull-requests/", form, loadData)}
+              onClick={() => {
+                      post("pull-requests/", form, () => {
+                        loadData();              // refresh PR list
+                        setForm({                // clear form
+                          title: "",
+                          file_path: "",
+                          code: ""
+                        });
+                        setTab("prs");           // switch to PR tab (🔥 nice UX)
+                      });
+                    }}
             >
               Submit Code
             </button>
@@ -216,26 +230,28 @@ export default function RepoDetail() {
             )}
 
             {/* ACTIONS */}
-            <div style={actionRow}>
-              <button
-                style={rejectBtn}
-                onClick={() => post("reviews/", {
-                  pr_id: pr.id,
-                  status: "rejected"
-                }, loadData)}
-              >
-                Reject
-              </button>
+            {["owner", "maintainer"].includes(currentUserRole) && pr.status === "open" && (
+              <div style={actionRow}>
+                <button
+                  style={rejectBtn}
+                  onClick={() => post("reviews/", {
+                    pr_id: pr.id,
+                    status: "rejected"
+                  }, loadData)}
+                >
+                  Reject
+                </button>
 
-              <button
-                style={mergeBtn}
-                onClick={() => post(`pull-requests/${pr.id}/action/`, {
-                  action: "merge"
-                }, loadData)}
-              >
-                Merge
-              </button>
-            </div>
+                <button
+                  style={mergeBtn}
+                  onClick={() => post(`pull-requests/${pr.id}/action/`, {
+                    action: "merge"
+                  }, loadData)}
+                >
+                  Merge
+                </button>
+              </div>
+            )}
 
           </div>
         ))}
@@ -247,40 +263,42 @@ export default function RepoDetail() {
         <h3>Collaborators</h3>
 
         {/* ADD USER */}
-        <div style={card}>
-          <h4>Add Collaborator</h4>
+        {["owner", "maintainer"].includes(currentUserRole) && (
+          <div style={card}>
+            <h4>Add Collaborator</h4>
 
-          <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-            <input
-              style={input}
-              placeholder="Enter User ID"
-              value={newUserId}
-              onChange={e => setNewUserId(e.target.value)}
-            />
+            <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+              <input
+                style={input}
+                placeholder="Enter Username or ID"
+                value={newUserId}
+                onChange={e => setNewUserId(e.target.value)}
+              />
 
-            <select
-              style={input}
-              value={newRole}
-              onChange={e => setNewRole(e.target.value)}
-            >
-              <option value="contributor">Contributor</option>
-              <option value="maintainer">Maintainer</option>
-            </select>
+              <select
+                style={input}
+                value={newRole}
+                onChange={e => setNewRole(e.target.value)}
+              >
+                <option value="contributor">Contributor</option>
+                <option value="maintainer">Maintainer</option>
+              </select>
 
-            <button
-              style={button}
-              onClick={() => {
-                post("collaborators/", {
-                  username: newUserId,
-                  role: newRole,
-                  added_by: user?.id
-                }, loadData);
-              }}
-            >
-              Add
-            </button>
+              <button
+                style={button}
+                onClick={() => {
+                  post("collaborators/", {
+                    username: newUserId,
+                    role: newRole,
+                    added_by: user?.id
+                  }, loadData);
+                }}
+              >
+                Add
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* LIST */}
         {collabs.map(c => (
@@ -299,21 +317,23 @@ export default function RepoDetail() {
                 {c.role}
               </span>
 
-              <button
-                style={removeBtn}
-                onClick={() => {
-                  fetch(API + "collaborators/", {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      user_id: c.user_id,
-                      repo_id: id
-                    })
-                  }).then(loadData);
-                }}
-              >
-                Remove
-              </button>
+              {["owner", "maintainer"].includes(currentUserRole) && (
+                <button
+                  style={removeBtn}
+                  onClick={() => {
+                    fetch(API + "collaborators/", {
+                      method: "DELETE",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        user_id: c.user_id,
+                        repo_id: id
+                      })
+                    }).then(loadData);
+                  }}
+                >
+                  Remove
+                </button>
+              )}
 
             </div>
           </div>
